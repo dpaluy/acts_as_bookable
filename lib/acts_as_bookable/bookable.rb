@@ -40,6 +40,7 @@ module ActsAsBookable
 
           def schedule_required?
             return false unless self.booking_opts
+            return false if self.booking_opts[:allow_nil]
 
             self.booking_opts[:time_type] != :none
           end

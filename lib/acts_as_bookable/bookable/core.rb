@@ -107,10 +107,11 @@ module ActsAsBookable::Bookable
           time_type: [:range, :fixed, :none],
           capacity_type: [:open, :closed, :none],
           preset: [:room, :event, :show],
-          bookable_across_occurrences: [true, false]
+          bookable_across_occurrences: [true, false],
+          allow_nil: [true, false]
         }
         self.booking_opts.each_pair do |key, val|
-          if !permitted_options.has_key? key
+          if !permitted_options.key? key
             raise ActsAsBookable::InitializationError.new(self, "#{key} is not a valid option")
           elsif !permitted_options[key].include? val
             raise ActsAsBookable::InitializationError.new(self, "#{val} is not a valid value for #{key}. Allowed values are: #{permitted_options[key]}")

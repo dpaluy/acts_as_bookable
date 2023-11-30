@@ -1,6 +1,5 @@
 module ActsAsBookable
   module Bookable
-
     def bookable?
       false
     end
@@ -12,7 +11,7 @@ module ActsAsBookable
     #   class Room < ActiveRecord::Base
     #     acts_as_bookable
     #   end
-    def acts_as_bookable(options={})
+    def acts_as_bookable(options = {})
       bookable(options)
     end
 
@@ -20,7 +19,6 @@ module ActsAsBookable
 
     # Make a model bookable
     def bookable(options)
-
       if bookable?
         self.booking_opts = options
       else
@@ -41,7 +39,9 @@ module ActsAsBookable
           end
 
           def schedule_required?
-            self.booking_opts && self.booking_opts && self.booking_opts[:time_type] != :none
+            return false unless self.booking_opts
+
+            self.booking_opts[:time_type] != :none
           end
 
           def capacity_required?

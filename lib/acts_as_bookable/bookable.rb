@@ -46,7 +46,7 @@ module ActsAsBookable
           end
 
           def capacity_required?
-            self.booking_opts && self.booking_opts[:capacity_type] != :none
+            self.booking_opts && !%i[none single].include?(self.booking_opts[:capacity_type])
           end
         end
       end

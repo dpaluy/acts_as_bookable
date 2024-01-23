@@ -52,7 +52,7 @@ module ActsAsBookable::Bookable
           required_params[:amount] = [Integer]
         when :open
           required_params[:amount] = [Integer]
-        when :none
+        else :none
           unpermitted_params << :amount
         end
 
@@ -105,7 +105,7 @@ module ActsAsBookable::Bookable
         # Validates options
         permitted_options = {
           time_type: [:range, :fixed, :none],
-          capacity_type: [:open, :closed, :none],
+          capacity_type: [:open, :closed, :none, :single],
           preset: [:room, :event, :show],
           bookable_across_occurrences: [true, false],
           allow_nil: [true, false]
@@ -168,7 +168,7 @@ module ActsAsBookable::Bookable
         self.validate_booking_options!(opts)
 
         # Capacity check (done first because it doesn't require additional queries)
-        if self.booking_opts[:capacity_type] != :none
+        unless %i[none single].include?(self.booking_opts[:capacity_type])
           # Amount > capacity
           if opts[:amount] > self.capacity
             raise ActsAsBookable::AvailabilityError.new ActsAsBookable::T.er('.availability.amount_gt_capacity', model: self.class.to_s)
@@ -213,7 +213,7 @@ module ActsAsBookable::Bookable
         #
         overlapped = ActsAsBookable::Booking.overlapped(self, opts)
         # If capacity_type is :closed cannot book if already booked (no matter if amount < capacity)
-        if self.booking_opts[:capacity_type] == :closed && !overlapped.empty?
+        if %i[closed single].include?(self.booking_opts[:capacity_type]) && !overlapped.empty?
           raise ActsAsBookable::AvailabilityError.new ActsAsBookable::T.er('.availability.already_booked', model: self.class.to_s)
         end
         # if capacity_type is :open, check if amount <= maximum amount of overlapped booking
